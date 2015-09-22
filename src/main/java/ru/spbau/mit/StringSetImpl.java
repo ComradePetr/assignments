@@ -46,11 +46,12 @@ public class StringSetImpl implements StringSet, StreamSerializable {
         int DFS_deserialize(InputStream in) {
             try {
                 sum = in.read();
+                size += sum;
                 ends = sum == 1;
                 for (int i = 0; i < MAX_C; i++)
                     next[i] = null;
                 byte c;
-                while ((c = (byte)in.read()) != BYTE_UP)
+                while ((c = (byte) in.read()) != BYTE_UP)
                     sum += (next[c] = new Node()).DFS_deserialize(in);
                 return sum;
             } catch (IOException e) {
@@ -106,8 +107,8 @@ public class StringSetImpl implements StringSet, StreamSerializable {
      * @return <tt>true</tt> if this set contained the specified element
      */
     public boolean remove(String element) {
-        Node v=find(element);
-        if(v==null || !v.ends)
+        Node v = find(element);
+        if (v == null || !v.ends)
             return false;
 
         Node cur = root;
@@ -153,6 +154,7 @@ public class StringSetImpl implements StringSet, StreamSerializable {
      * @throws SerializationException in case of IOException during deserialization
      */
     public void deserialize(InputStream in) {
+        size = 0;
         root.DFS_deserialize(in);
     }
 }
