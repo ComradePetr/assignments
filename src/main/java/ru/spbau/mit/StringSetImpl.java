@@ -29,13 +29,13 @@ public class StringSetImpl implements StringSet, StreamSerializable {
             return next[c];
         }
 
-        void DFS_serialize(OutputStream out) {
+        void serialize(OutputStream out) {
             try {
                 out.write(ends ? 1 : 0);
                 for (int i = 0; i < MAX_C; i++)
                     if (next[i] != null) {
                         out.write(i);
-                        next[i].DFS_serialize(out);
+                        next[i].serialize(out);
                         out.write(BYTE_UP);
                     }
             } catch (IOException e) {
@@ -43,7 +43,7 @@ public class StringSetImpl implements StringSet, StreamSerializable {
             }
         }
 
-        int DFS_deserialize(InputStream in) {
+        int deserialize(InputStream in) {
             try {
                 sum = in.read();
                 size += sum;
@@ -52,10 +52,10 @@ public class StringSetImpl implements StringSet, StreamSerializable {
                     next[i] = null;
                 byte c;
                 while ((c = (byte) in.read()) != BYTE_UP)
-                    sum += (next[c] = new Node()).DFS_deserialize(in);
+                    sum += (next[c] = new Node()).deserialize(in);
                 return sum;
             } catch (IOException e) {
-                throw new SerializationException("Can't write to OutputStream");
+                throw new SerializationException("Can't read from InputStream");
             }
         }
     }
@@ -144,7 +144,7 @@ public class StringSetImpl implements StringSet, StreamSerializable {
      * @throws SerializationException in case of IOException during serialization
      */
     public void serialize(OutputStream out) {
-        root.DFS_serialize(out);
+        root.serialize(out);
     }
 
     /**
@@ -155,6 +155,6 @@ public class StringSetImpl implements StringSet, StreamSerializable {
      */
     public void deserialize(InputStream in) {
         size = 0;
-        root.DFS_deserialize(in);
+        root.deserialize(in);
     }
 }
