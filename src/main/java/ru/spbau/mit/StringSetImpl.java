@@ -62,27 +62,6 @@ public class StringSetImpl implements StringSet, StreamSerializable {
 
     final Node root = new Node();
 
-    /**
-     * Expected complexity: O(|element|)
-     *
-     * @param element
-     * @return <tt>true</tt> if this set did not already contain the specified
-     * element
-     */
-    public boolean add(String element) {
-        Node cur = root;
-        for (int i = 0; i < element.length(); i++) {
-            ++cur.sum;
-            cur = cur.nextForced(element.charAt(i));
-        }
-        ++cur.sum;
-        ++size;
-
-        boolean res = cur.ends;
-        cur.ends = true;
-        return !res;
-    }
-
     private Node find(String element) {
         Node cur = root;
         for (int i = 0; cur != null && i < element.length(); i++)
@@ -104,11 +83,32 @@ public class StringSetImpl implements StringSet, StreamSerializable {
      * Expected complexity: O(|element|)
      *
      * @param element
+     * @return <tt>true</tt> if this set did not already contain the specified
+     * element
+     */
+    public boolean add(String element) {
+        if (contains(element))
+            return false;
+
+        Node cur = root;
+        for (int i = 0; i < element.length(); i++) {
+            ++cur.sum;
+            cur = cur.nextForced(element.charAt(i));
+        }
+        ++cur.sum;
+        ++size;
+        cur.ends = true;
+        return true;
+    }
+
+    /**
+     * Expected complexity: O(|element|)
+     *
+     * @param element
      * @return <tt>true</tt> if this set contained the specified element
      */
     public boolean remove(String element) {
-        Node v = find(element);
-        if (v == null || !v.ends)
+        if (!contains(element))
             return false;
 
         Node cur = root;
