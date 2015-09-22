@@ -106,19 +106,19 @@ public class StringSetImpl implements StringSet, StreamSerializable {
      * @return <tt>true</tt> if this set contained the specified element
      */
     public boolean remove(String element) {
+        Node v=find(element);
+        if(v==null || !v.ends)
+            return false;
+
         Node cur = root;
         for (int i = 0; cur != null && i < element.length(); i++) {
             --cur.sum;
             cur = cur.next(element.charAt(i));
         }
-
-        if (cur != null && cur.ends) {
-            --cur.sum;
-            cur.ends = false;
-            --size;
-            return true;
-        } else
-            return false;
+        --cur.sum;
+        cur.ends = false;
+        --size;
+        return true;
     }
 
     /**
