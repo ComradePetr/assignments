@@ -10,49 +10,52 @@ import java.io.OutputStream;
 
 
 public class StringSetImpl implements StringSet, StreamSerializable {
-    private int size = 0;
-
-    public class Node {
-        final int MAX_C = 128;
-        final byte BYTE_UP = -1;
-        public boolean ends = false;
+    public static class Node {
+        private static final int MAX_CHAR_CODE = 128;
+        private static final byte BYTE_GO_UP = -1;
+        public boolean isTerminal = false;
         public int sum = 0;
-        private Node[] next = new Node[MAX_C];
+        private Node[] next = new Node[MAX_CHAR_CODE];
 
-        Node nextForced(char c) {
-            if (next[c] == null)
+        public Node nextForced(char c) {
+            if (next[c] == null) {
                 next[c] = new Node();
+            }
             return next[c];
         }
 
-        Node next(char c) {
+        public Node next(char c) {
             return next[c];
         }
 
-        void serialize(OutputStream out) {
+        public void serialize(OutputStream out) {
             try {
-                out.write(ends ? 1 : 0);
-                for (int i = 0; i < MAX_C; i++)
+                out.write(isTerminal ? 1 : 0);
+                for (int i = 0; i < MAX_CHAR_CODE; i++) {
                     if (next[i] != null) {
                         out.write(i);
                         next[i].serialize(out);
-                        out.write(BYTE_UP);
+                        out.write(BYTE_GO_UP);
                     }
+                }
             } catch (IOException e) {
                 throw new SerializationException("Can't write to OutputStream");
             }
         }
 
-        int deserialize(InputStream in) {
+        public int deserialize(InputStream in) {
             try {
                 sum = in.read();
-                size += sum;
-                ends = sum == 1;
-                for (int i = 0; i < MAX_C; i++)
+                isTerminal = sum == 1;
+                for (int i = 0; i < MAX_CHAR_CODE; i++) {
                     next[i] = null;
-                byte c;
-                while ((c = (byte) in.read()) != BYTE_UP)
-                    sum += (next[c] = new Node()).deserialize(in);
+                }
+                byte c = (byte) in.read();
+                while (c != BYTE_GO_UP) {
+                    next[c] = new Node();
+                    sum += next[c].deserialize(in);
+                    c = (byte) in.read();
+                }
                 return sum;
             } catch (IOException e) {
                 throw new SerializationException("Can't read from InputStream");
@@ -60,12 +63,13 @@ public class StringSetImpl implements StringSet, StreamSerializable {
         }
     }
 
-    final Node root = new Node();
+    private final Node root = new Node();
 
     private Node find(String element) {
         Node cur = root;
-        for (int i = 0; cur != null && i < element.length(); i++)
+        for (int i = 0; cur != null && i < element.length(); i++) {
             cur = cur.next(element.charAt(i));
+        }
         return cur;
     }
 
@@ -76,7 +80,7 @@ public class StringSetImpl implements StringSet, StreamSerializable {
      */
     public boolean contains(String element) {
         Node cur = find(element);
-        return cur != null && cur.ends;
+        return cur != null && cur.isTerminal;
     }
 
     /**
@@ -87,8 +91,9 @@ public class StringSetImpl implements StringSet, StreamSerializable {
      * element
      */
     public boolean add(String element) {
-        if (contains(element))
+        if (contains(element)) {
             return false;
+        }
 
         Node cur = root;
         for (int i = 0; i < element.length(); i++) {
@@ -96,8 +101,7 @@ public class StringSetImpl implements StringSet, StreamSerializable {
             cur = cur.nextForced(element.charAt(i));
         }
         ++cur.sum;
-        ++size;
-        cur.ends = true;
+        cur.isTerminal = true;
         return true;
     }
 
@@ -108,8 +112,9 @@ public class StringSetImpl implements StringSet, StreamSerializable {
      * @return <tt>true</tt> if this set contained the specified element
      */
     public boolean remove(String element) {
-        if (!contains(element))
+        if (!contains(element)) {
             return false;
+        }
 
         Node cur = root;
         for (int i = 0; cur != null && i < element.length(); i++) {
@@ -117,8 +122,7 @@ public class StringSetImpl implements StringSet, StreamSerializable {
             cur = cur.next(element.charAt(i));
         }
         --cur.sum;
-        cur.ends = false;
-        --size;
+        cur.isTerminal = false;
         return true;
     }
 
@@ -126,7 +130,7 @@ public class StringSetImpl implements StringSet, StreamSerializable {
      * Expected complexity: O(1)
      */
     public int size() {
-        return size;
+        return root.sum;
     }
 
     /**
@@ -154,7 +158,6 @@ public class StringSetImpl implements StringSet, StreamSerializable {
      * @throws SerializationException in case of IOException during deserialization
      */
     public void deserialize(InputStream in) {
-        size = 0;
         root.deserialize(in);
     }
 }
