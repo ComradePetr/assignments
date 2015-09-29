@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 
 public class Function1Test {
     @Test
-    public void testSimple() {
+    public void testCompose() {
         Function1<Integer, Integer> plus3 = new Function1<Integer, Integer>() {
             @Override
             public Integer apply(Integer x) {
@@ -21,6 +21,6 @@ public class Function1Test {
         };
         Function1<Integer, Integer> f = plus3.compose(mult5);
 
-        assertEquals(25, (int)f.apply(2));
+        assertEquals(25, (int) f.apply(2));
     }
 }
