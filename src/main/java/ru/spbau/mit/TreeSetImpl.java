@@ -59,6 +59,10 @@ public class TreeSetImpl<E> extends AbstractSet<E> {
             cur = start;
         }
 
+        public void remove() {
+            throw new UnsupportedOperationException("remove");
+        }
+
         /**
          * Returns {@code true} if the iteration has more elements.
          * (In other words, returns {@code true} if {@link #next} would
