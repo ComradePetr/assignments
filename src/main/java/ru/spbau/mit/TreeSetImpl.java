@@ -50,6 +50,14 @@ public class TreeSetImpl<E> extends AbstractSet<E> {
             }
             return cur;
         }
+
+        private Node maxElement() {
+            Node cur = this;
+            while (cur.r != null) {
+                cur = cur.r;
+            }
+            return cur;
+        }
     }
 
     private class TreeIterator implements Iterator<E> {
@@ -60,7 +68,14 @@ public class TreeSetImpl<E> extends AbstractSet<E> {
         }
 
         public void remove() {
-            throw new UnsupportedOperationException("remove");
+            if (cur == null) {
+                throw new IllegalStateException();
+            } else {
+                Pair p = split(root, cur.x);
+                Pair q = split(p.y, cur.x, true);
+                cur = p.x == null ? null : p.x.maxElement();
+                root = merge(p.x, q.y);
+            }
         }
 
         /**
