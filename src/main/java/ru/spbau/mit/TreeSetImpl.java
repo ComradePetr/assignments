@@ -133,18 +133,25 @@ public class TreeSetImpl<E> extends AbstractSet<E> {
         return x;
     }
 
-    private Pair split(Node v, E x) {
+    private Pair split(Node v, E x, boolean equalsLeft) {
         if (v == null) {
             return new Pair(null, null);
-        } else if (cmp.compare(x, v.x) <= 0) {
-            Pair p = split(v.l, x);
-            v.l = p.y;
-            return new Pair(recalc(p.x), recalc(v));
         } else {
-            Pair p = split(v.r, x);
-            v.r = p.x;
-            return new Pair(recalc(v), recalc(p.y));
+            int c = cmp.compare(x, v.x);
+            if (c < 0 || (c == 0 && !equalsLeft)) {
+                Pair p = split(v.l, x, equalsLeft);
+                v.l = p.y;
+                return new Pair(recalc(p.x), recalc(v));
+            } else {
+                Pair p = split(v.r, x, equalsLeft);
+                v.r = p.x;
+                return new Pair(recalc(v), recalc(p.y));
+            }
         }
+    }
+
+    private Pair split(Node v, E x) {
+        return split(v, x, false);
     }
 
     private Node merge(Node l, Node r) {
@@ -181,5 +188,14 @@ public class TreeSetImpl<E> extends AbstractSet<E> {
         Pair p = split(root, e);
         root = merge(merge(p.x, new Node(e)), p.y);
         return true;
+    }
+
+    @Override
+    public boolean remove(Object eo) {
+        E e = (E) eo;
+        Pair p = split(root, e);
+        Pair q = split(p.y, e, true);
+        root = merge(p.x, q.y);
+        return q.x != null;
     }
 }
