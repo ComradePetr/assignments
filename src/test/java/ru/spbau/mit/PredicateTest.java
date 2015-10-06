@@ -2,11 +2,12 @@ package ru.spbau.mit;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class PredicateTest {
     @Test
-    public void testOrAnd() {
+    public void testOrAndNot() {
         Predicate<Integer> even = new Predicate<Integer>() {
             @Override
             public Boolean apply(Integer x) {
@@ -28,6 +29,9 @@ public class PredicateTest {
         assertTrue(mod3Is1.or(even).apply(6));
         assertTrue(mod3Is1.or(even).apply(7));
         assertFalse(mod3Is1.or(even).apply(9));
+        Predicate<Integer> notMod3Is1 = mod3Is1.not();
+        assertTrue(notMod3Is1.apply(5));
+        assertFalse(notMod3Is1.not().apply(5));
     }
 
     @Test
@@ -40,7 +44,7 @@ public class PredicateTest {
         };
         Predicate<Integer> err = new Predicate<Integer>() {
             @Override
-            public Boolean apply(Integer x){
+            public Boolean apply(Integer x) {
                 assertTrue(false);
                 return true;
             }
@@ -51,7 +55,7 @@ public class PredicateTest {
         assertTrue(Predicate.ALWAYS_TRUE.or(err).apply(0));
     }
 
-    @Test(expected=AssertionError.class)
+    @Test(expected = AssertionError.class)
     public void testShortCircuitAnd() {
         Predicate<Integer> even = new Predicate<Integer>() {
             @Override
@@ -61,7 +65,7 @@ public class PredicateTest {
         };
         Predicate<Integer> err = new Predicate<Integer>() {
             @Override
-            public Boolean apply(Integer x){
+            public Boolean apply(Integer x) {
                 assertTrue(false);
                 return true;
             }
@@ -69,7 +73,7 @@ public class PredicateTest {
         even.and(err).apply(4);
     }
 
-    @Test(expected=AssertionError.class)
+    @Test(expected = AssertionError.class)
     public void testShortCircuitOr() {
         Predicate<Integer> even = new Predicate<Integer>() {
             @Override
@@ -79,7 +83,7 @@ public class PredicateTest {
         };
         Predicate<Integer> err = new Predicate<Integer>() {
             @Override
-            public Boolean apply(Integer x){
+            public Boolean apply(Integer x) {
                 assertTrue(false);
                 return true;
             }
