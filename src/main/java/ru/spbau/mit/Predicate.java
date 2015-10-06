@@ -14,19 +14,19 @@ public abstract class Predicate<A> extends Function1<A, Boolean> {
         }
     };
 
-    public Predicate<A> or(final Predicate<A> p) {
-        return new Predicate<A>() {
+    public <T extends A> Predicate<T> or(final Predicate<T> p) {
+        return new Predicate<T>() {
             @Override
-            public Boolean apply(A x) {
+            public Boolean apply(T x) {
                 return Predicate.this.apply(x) || p.apply(x);
             }
         };
     }
 
-    public Predicate<A> and(final Predicate<A> p) {
-        return new Predicate<A>() {
+    public <T extends A> Predicate<T> and(final Predicate<T> p) {
+        return new Predicate<T>() {
             @Override
-            public Boolean apply(A x) {
+            public Boolean apply(T x) {
                 return Predicate.this.apply(x) && p.apply(x);
             }
         };
