@@ -1,6 +1,7 @@
 package ru.spbau.mit;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -80,7 +81,7 @@ public class QuizGame implements Game {
     }
 
     public void setDictionaryFilename(String dictionaryFilename) throws IOException {
-        List<String> lines = Files.readAllLines(Paths.get(dictionaryFilename));
+        List<String> lines = Files.readAllLines(Paths.get(dictionaryFilename), StandardCharsets.UTF_8);
         for (String line : lines) {
             String[] splitted = line.split(";");
             questions.add(splitted[0]);
