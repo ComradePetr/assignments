@@ -31,6 +31,7 @@ public class GameServerImpl implements GameServer {
         final int id = messagesQueue.size();
         final String ids = Integer.toString(id);
         messagesQueue.add(new LinkedBlockingQueue<String>());
+        sendTo(id, ids);
 
         Thread sender = new Thread(new Runnable() {
             @Override
@@ -73,7 +74,6 @@ public class GameServerImpl implements GameServer {
         });
         receiver.start();
 
-        sendTo(id, ids);
         game.onPlayerConnected(ids);
     }
 
