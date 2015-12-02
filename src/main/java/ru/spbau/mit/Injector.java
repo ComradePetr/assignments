@@ -64,6 +64,8 @@ public class Injector {
             parametersList.add(initialize(candidates.get(0)));
         }
 
-        return constructor.newInstance(parametersList.toArray());
+        Object createdObject = constructor.newInstance(parametersList.toArray());
+        saved.put(rootClass, createdObject);
+        return createdObject;
     }
 }
