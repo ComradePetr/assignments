@@ -7,14 +7,13 @@ import java.util.List;
 
 
 public class Injector {
+    private static Class<?>[] implementationClasses = null;
+    private static HashMap<Class<?>, Object> saved = new HashMap<Class<?>, Object>();
 
     /**
      * Create and initialize object of `rootClassName` class using classes from
      * `implementationClassNames` for concrete dependencies.
      */
-    static Class<?>[] implementationClasses = null;
-    static HashMap<Class<?>, Object> saved = new HashMap<Class<?>, Object>();
-
     public static Object initialize(String rootClassName, List<String> implementationClassNames) throws Exception {
         implementationClasses = new Class<?>[implementationClassNames.size() + 1];
         implementationClasses[0] = Class.forName(rootClassName);
@@ -41,7 +40,7 @@ public class Injector {
 
         Constructor<?>[] constructors = rootClass.getDeclaredConstructors();
         if (constructors.length != 1) {
-            throw new IllegalStateException();
+            throw new IllegalArgumentException();
         }
 
         Constructor<?> constructor = constructors[0];
