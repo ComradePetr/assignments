@@ -16,9 +16,10 @@ public class Injector {
     static HashMap<Class<?>, Object> saved = new HashMap<Class<?>, Object>();
 
     public static Object initialize(String rootClassName, List<String> implementationClassNames) throws Exception {
-        implementationClasses = new Class<?>[implementationClassNames.size()];
+        implementationClasses = new Class<?>[implementationClassNames.size() + 1];
+        implementationClasses[0] = Class.forName(rootClassName);
         saved.clear();
-        int i = 0;
+        int i = 1;
         for (String implementationClassName : implementationClassNames) {
             implementationClasses[i++] = Class.forName(implementationClassName);
         }
@@ -47,9 +48,6 @@ public class Injector {
         ArrayList<Object> parametersList = new ArrayList<>();
         for (Class<?> parameterType : constructor.getParameterTypes()) {
             ArrayList<Class<?>> candidates = new ArrayList<>();
-            if (parameterType.isAssignableFrom(rootClass)) {
-                candidates.add(rootClass);
-            }
             for (Class<?> curClass : implementationClasses) {
                 if (parameterType.isAssignableFrom(curClass)) {
                     candidates.add(curClass);
